@@ -1,25 +1,25 @@
 from django.shortcuts import render
 
-# Add the following import
+from django.views.generic.edit import CreateView, UpdateView, DeleteView
+# Create your views here.
 from django.http import HttpResponse
 
+from .models import Dog
 
-class Dog:  # Note that parens are optional if not inheriting from another class
-  def __init__(self, name, breed, description, age):
-    self.name = name
-    self.breed = breed
-    self.description = description
-    self.age = age
+class DogUpdate(UpdateView):
+  model = Dog
+  # disallow the update of the name
+  fields = ['breed', 'description', 'age']
 
-# This the array, we are injecting into the template
-dogs = [
-  Dog('Kona', 'German Shepard', 'spoiled lovable brat', 5),
-  Dog('Bud', 'Golden Retriver', 'Old reliable', 7),
-  Dog('Cheese', 'Pittbull', 'All bark no bite', 2),
-  Dog('Cooper', 'Labrador', 'Young Blood', 0)
+class DogDelete(DeleteView):
+  model = Dog
+  # want to define the success_url, since when we delete something we can't redirect to the detail page
+  success_url = '/dogs/' 
+
+class DogCreate(CreateView):
+  model = Dog 
   
-]
-
+  fields = '__all__' 
 
 
 
@@ -28,7 +28,15 @@ def home(request):
 	return render(request, 'home.html')
 
 def about(request):
-    return render(request, 'about.html')
+  return render(request, 'about.html')
 
 def dogs_index(request):
-    return render(request, 'dogs/index.html', {'dogs': dogs})
+  dogs = Dog.objects.all()
+  return render(request, 'dogs/index.html', {'dogs': dogs})
+
+def dogs_detail(request, dog_id):
+  # use our model Cat (Capital cat) to retrieve whatever row
+  # from our db the cat_id matches
+  dog = Dog.objects.get(id=dog_id)
+  #cats/detail.html <-- refers to template
+  return render(request,'dogs/detail.html', {'dog': dog})
