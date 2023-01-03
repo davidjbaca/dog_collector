@@ -29,7 +29,7 @@ class DogDelete(DeleteView):
 class DogCreate(CreateView):
   model = Dog 
   
-  fields = '__all__' 
+  fields = ['name', 'breed', 'description', 'age'] 
 
 
 
